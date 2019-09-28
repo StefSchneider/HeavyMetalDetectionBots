@@ -133,7 +133,7 @@ ITEM_FORMS: dict = {"Plain": {"string": "plain", # Kurzversion des Namens
                                       },
                     "Lemmium Medium": {"string": "medium",
                                        "short": "LM",
-                                       "acccessible": True,
+                                       "accessible": True,
                                        "size": [3, 3],
                                        "min_size": [3, 3]
                                        },
