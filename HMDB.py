@@ -91,6 +91,7 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 ## 26.9.2019 # 20:13 # A
 ## 26.9.2019 # 20:32 # E
 ## 28.9.2019 # 16:57 # A # create Git repository
+## 28.9.2019 # 17:35 # E
 
 
 
