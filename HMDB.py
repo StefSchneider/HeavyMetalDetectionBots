@@ -122,7 +122,7 @@ ITEM_FORMS: dict = {"Plain": {"string": "plain", # Kurzversion des Namens
                     "Rock": {"string": "rock",
                              "short": "R",
                              "accessible": False,
-                             "size": [3, 3],
+                             "size": [4, 3],
                              "min_size": [1, 1]
                              },
                     "Lemmium Light": {"string": "light",
