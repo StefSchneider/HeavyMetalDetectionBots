@@ -93,6 +93,7 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 ## 28.9.2019 # 16:57 # A # create Git repository
 ## 28.9.2019 # 17:35 # E
 ## 29.9.2019 # 11:44 # A # Refactoring / Bot Rules
+## 29.9.2019 # 12:07 # E
 
 
 
@@ -123,7 +124,7 @@ ITEM_FORMS: dict = {"Plain": {"string": "plain", # Kurzversion des Namens
                     "Rock": {"string": "rock",
                              "short": "R",
                              "accessible": False,
-                             "size": [3, 3],
+                             "size": [4, 3],
                              "min_size": [1, 1]
                              },
                     "Lemmium Light": {"string": "light",
@@ -166,7 +167,8 @@ BOT_DIRECTIONS = {"up": [-1, 0], # [y, x]-Reihenfolge wg. numpy.ndarray
 bots: list = [] # Liste mit allen Bots
 bots_on_lemmium: set = {}   # Sobald ein Bot ein Heavy-Lemmium-Feld erreicht hat, wird seine Nummer in die Menge
                             # aufgenommen. Falls die Länge dieser Menge der Anzahl der Bots entspricht, haben alle
-                            # Bots Hevy Lemmium erreicht und die Suche ist beendet.
+                            # Bots Heavy Lemmium erreicht und die Suche ist beendet. Anstelle einer Liste wird eine
+                            # Menge erzeugt, da diese die entsprechenden Bots nur einmal und nicht doppelt aufnimmt.
 
 
 # KLASSEN
@@ -354,23 +356,21 @@ class Area:
 
         return start_field
 
-    def build(self):
+    def build_pain_initial(self):
         """
-        Nachdem über die Methode __init__ das Spielfeld als Array angelegt wurde, wird die Spielumgebung in mehreren
-        Schritten aufgebaut:
-        1. Füllen aller Zellen mit Plain
-        2. Platzierung der Felder für Lemmium
-        3. Platzierung der Felder für Rocks
-        4. Platzierung der Bots
+        Befüllt alle Zellen des Spielfeldes initial mit einem Objekt der Klasse Plain
         """
-        # 1. Füllen aller Zellen mit Plain
         all_cells: list = []
-        start_field: list = self.create("Plain")[0][0] # zieht nur die Liste mit dem x-/y-Element aus der Liste
-        for x in range(AREA_SIZE[0]): # Füllt alle Zellen initial mit Objekt der Klasse Item(Plain)
+        start_field: list = self.create("Plain")[0][0]  # zieht nur die Liste mit dem x-/y-Element aus der Liste
+        for x in range(AREA_SIZE[0]):  # Füllt alle Zellen initial mit Objekt der Klasse Item(Plain)
             for y in range(AREA_SIZE[1]):
-                all_cells.append([x+start_field[0], y+start_field[1]])
+                all_cells.append([x + start_field[0], y + start_field[1]])
         self.fill_fields(all_cells, "Plain")
-        # 2. Platzierung der Felder für Lemmium
+
+    def build_lemmium(self):
+        """
+        Platziert das Lemmium-Feld an einer geeigneten Stelle, indem es eine ausreichend große Freifläche sucht.
+        """
         lemmium_fields_all_data = self.create("Lemmium")
         lemmium_light_fields: list = []
         lemmium_medium_fields: list = []
@@ -384,15 +384,19 @@ class Area:
                 lemmium_heavy_fields.append(fields[0])
         start_field = self.determine_start_point(lemmium_light_fields, "Lemmium Light")
         for i, field in enumerate(lemmium_light_fields):
-            lemmium_light_fields[i] = [field[0]+start_field[0], field[1]+start_field[1]]
+            lemmium_light_fields[i] = [field[0] + start_field[0], field[1] + start_field[1]]
         self.fill_fields(lemmium_light_fields, "Lemmium Light")
         for i, field in enumerate(lemmium_medium_fields):
-            lemmium_medium_fields[i] = [field[0]+start_field[0], field[1]+start_field[1]]
+            lemmium_medium_fields[i] = [field[0] + start_field[0], field[1] + start_field[1]]
         self.fill_fields(lemmium_medium_fields, "Lemmium Medium")
         for i, field in enumerate(lemmium_heavy_fields):
-            lemmium_heavy_fields[i] = [field[0]+start_field[0], field[1]+start_field[1]]
+            lemmium_heavy_fields[i] = [field[0] + start_field[0], field[1] + start_field[1]]
         self.fill_fields(lemmium_heavy_fields, "Lemmium Heavy")
-        # 3. Platzierung der Felder für Rocks
+
+    def build_rocks(self):
+        """
+        Platziert die vorgegebene Anzahl an Objekten der Klasse Rock auf ausreichend großen Freiflächen.
+        """
         for rock_numbers in range(ROCK_NUMBER):
             rock_fields_split: list = []
             rock_fields_all_data = self.create("Rock")
@@ -403,6 +407,19 @@ class Area:
             for field in rock_fields_split:
                     rock_fields.append([field[0]+start_field[0], field[1]+start_field[1]])
             self.fill_fields(rock_fields, "Rock")
+
+    def build(self):
+        """
+        Nachdem über die Methode __init__ das Spielfeld als Array angelegt wurde, wird die Spielumgebung in mehreren
+        Schritten aufgebaut:
+        1. Füllen aller Zellen mit Plain
+        2. Platzierung der Felder für Lemmium
+        3. Platzierung der Felder für Rocks
+        4. Platzierung der Bots
+        """
+        self.build_pain_initial() # Füllen aller Zellen mit Plain
+        self.build_lemmium() # Platzierung der Felder für Lemmium
+        self.build_rocks() # Platzierung der Felder für Rocks
         # 4. Platzierung der Bots
 
     def line_content(self, line: list)-> str:
@@ -504,7 +521,6 @@ class Item:
          """
         self.item_form = item_form
 
-
     def __str__(self):
         """
         :return: Symbol, das im Spielfeld für das Objekte der Klasse Item eingetragen wird.
@@ -587,10 +603,33 @@ class Bot:
         Zudem kann die Bot-Nummer in eine Mengen-Variable aufgenommen werden. Ist len(Menge= gleich der Anzahl der
         Bots, müssen sie alle auf einem Heavy-Lemmium-Feld stehen
         """
-
         reached_heavy_lemmium: bool = False
 
         return reached_heavy_lemmium
+
+    # Rules
+
+    def move_random_order(self, bots_remain: list)-> list:
+        """
+
+        :param bots_remain:
+        :return:
+        """
+        self.bots_remain = bots_remain
+        bots_sorted: list = []
+
+        return bots_sorted
+
+    def move_overlap_order(self, bots_remain: list)-> list:
+        """
+
+        :param bots_remain:
+        :return:
+        """
+        self.bots_remain = bots_remain
+        bots_sorted:list = []
+
+        return bots_sorted
 
 
 class Gui:
