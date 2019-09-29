@@ -99,6 +99,8 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 ## 29.9.2019 # 14:48 # E
 ## 29.9.2019 # 16:54 # A
 ## 29.9.2019 # 17:36 # E
+## 29.9.2019 # 19:33 # A
+## 29.9.2019 # 20:25 # E
 
 
 # IMPORTE
@@ -316,6 +318,19 @@ class Area:
             for x in range(x_start, x_start+FIELD_SIZE[0]):
                 for y in range(y_start, y_start+FIELD_SIZE[1]):
                     self.area[y, x] = Item(self.item_form)
+
+    def fill_cells(self, cells_in: int, item_form: str):
+        """
+
+        :param cells_in:
+        :param item_form:
+        :return:
+        """
+        self.cells_in = cells_in
+        self.item_form = item_form
+        for cells in self.cells_in:
+            pass
+
 
     def field_complete_empty(self, field: list)-> bool:
         """
@@ -591,22 +606,46 @@ class Bot:
         :return:
         """
 
-    def determine_start_field(self)-> list:
+    def determine_start_cell(self, cells_in)-> list:
         """
         Ermittelt einen geeigneten Startpunkt [x, y] für ein Element, indem solange per Zufallsgenerator ein Startpunkt
         ermittelt und überprüft werden, ob damit in die Spielumgebung passt, bis der Startpunkt gefunden ist.
         :param input_list: Liste der Felder, die das Element umfasst
-        :return: [x, y]-Werte des geeigneten Startpunkts
+        :return [x, y]-Werte des geeigneten Startpunkts
         """
+        self.cells_in = cells_in
+
         bot_fits: bool = False
-        start_field: list = []
+        start_cell: list = []
         while bot_fits == False:
-            start_field = [random.randint(0, (AREA_SIZE[0]*FIELD_SIZE[0])-BOT_SCAN_RADIUS[0])%FIELD_SIZE[0],
+            start_cell = [random.randint(0, (AREA_SIZE[0]*FIELD_SIZE[0])-BOT_SCAN_RADIUS[0])%FIELD_SIZE[0],
                            random.randint(0, (AREA_SIZE[1]-FIELD_SIZE[1])-BOT_SCAN_RADIUS[1])%FIELD_SIZE[1]]
             if Area.field_complete_empty(start_field[0], start_field[1]) == True:
                 bot_fits = True
 
         return start_field
+
+    def move_valid(self, cells_in: list)-> bool:
+        """
+
+        :param cells_in:
+        :return:
+        """
+        self.cells_in = cells_in
+        cells_empty: bool = False
+        min_x: int = min(cells[0][0] for cells in self.cells_in)
+        max_x: int = max(cells[0][0] for cells in self.cells_in)
+        min_y: int = min(cells[0][1] for cells in self.cells_in)
+        max_y: int = max(cells[0][1] for cells in self.cells_in)
+        for x in range(min_x, max_x+1):
+            for y in range(min_y, max_y+1):
+                if str(Area[y, x]) == ITEM_FORMS["Plain"]["short"]:
+                    cells_empty = True
+                else:
+                    cells_empty = False
+                    break
+
+        return cells_empty
 
     def drop(self):
         """
