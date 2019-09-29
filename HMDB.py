@@ -98,6 +98,7 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 
 
 
+
 import numpy as np
 import random
 import sys
