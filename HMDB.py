@@ -15,6 +15,7 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 
 """
 
+# Timestamps (DO NOT FORGET)
 ## project: Heavy Metal Detection Bots
 ## 10.8.2019 # 16:00 # A
 ## 10.8.2019 # 17:00 # E
@@ -95,16 +96,13 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 ## 29.9.2019 # 11:44 # A # Refactoring / Bot Rules
 ## 29.9.2019 # 12:07 # E
 ## 29.9.2019 # 14:08 # A
+## 29.9.2019 # 14:48 # E
 
 
-
-
-
+# IMPORTE
 
 import numpy as np
 import random
-import sys
-import pprint
 
 
 # KONSTANTEN
