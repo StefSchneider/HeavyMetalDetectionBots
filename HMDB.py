@@ -97,6 +97,8 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 ## 29.9.2019 # 12:07 # E
 ## 29.9.2019 # 14:08 # A
 ## 29.9.2019 # 14:48 # E
+## 29.9.2019 # 16:54 # A
+## 29.9.2019 # 17:36 # E
 
 
 # IMPORTE
@@ -418,8 +420,7 @@ class Area:
         for i in range(BOT_NUMBER):
             bot = Bot()
             bot.drop()
-            bot.id = i
-            bot.position = [x, y]
+            bot.id = i+1
             bots.append(bot.id)
 
     def build(self):
@@ -556,6 +557,7 @@ class Bot:
     """
     id: int = 0
     position: list = []
+    bot_cells: list = []
 
     bot_directions: list = list(BOT_DIRECTIONS.keys()) # ermittelt aus der Konstanten die möglichen Richtungen
     overlap_cells: int = 0 # Anzahl der Zellen, die sich der Bot mit anderen Bots überschneidet
@@ -564,18 +566,18 @@ class Bot:
         """
 
         """
-        bot_cells: list = []    # Liste der Zellen, die der einzelne Bot belegt. Muss außerhalb der __init__-Methode
+        self.bot_cells: list = []    # Liste der Zellen, die der einzelne Bot belegt. Muss außerhalb der __init__-Methode
                                 # stehen, da sie regelmäßig angepasst werden muss.
         # initiales Befüllen mit Bot-Zellen
         for x in range(BOT_SCAN_RADIUS[0]):
             for y in range(BOT_SCAN_RADIUS[1]):
-                bot_cells.append(([x, y], "1"))
+                self.bot_cells.append(([x, y], "1"))
         # Aufnahme der Bot_Core-Felder in die Liste durch Austausch entsprechender Bot-Scan-Felder
         start_bot_core: list = [int((BOT_SCAN_RADIUS[0]-BOT_SIZE[0])/2), int((BOT_SCAN_RADIUS[1]-BOT_SIZE[1])/2)]
         for x in range(start_bot_core[0], start_bot_core[0]+BOT_SIZE[0]):
             for y in range(start_bot_core[1], start_bot_core[1]+BOT_SIZE[1]):
-                bot_cells.remove(([x, y], "1"))
-                bot_cells.append(([x, y], "B"))
+                self.bot_cells.remove(([x, y], "1"))
+                self.bot_cells.append(([x, y], "B"))
 
     def __str__(self):
         """
@@ -589,7 +591,7 @@ class Bot:
         :return:
         """
 
-    def determine_start_point(self)-> list:
+    def determine_start_field(self)-> list:
         """
         Ermittelt einen geeigneten Startpunkt [x, y] für ein Element, indem solange per Zufallsgenerator ein Startpunkt
         ermittelt und überprüft werden, ob damit in die Spielumgebung passt, bis der Startpunkt gefunden ist.
@@ -599,14 +601,10 @@ class Bot:
         bot_fits: bool = False
         start_field: list = []
         while bot_fits == False:
-            start_field = [random.randint(0, AREA_SIZE[0]-BOT_SIZE[0]),
-                           random.randint(0, AREA_SIZE[1]-BOT_SIZE[1])]
-            for field in self.fields_in:
-                if self.field_complete_empty([field[0]+start_field[0], field[1]+start_field[1]]) == True:
-                    item_fits = True
-                else:
-                    item_fits = False
-                    break
+            start_field = [random.randint(0, (AREA_SIZE[0]*FIELD_SIZE[0])-BOT_SCAN_RADIUS[0])%FIELD_SIZE[0],
+                           random.randint(0, (AREA_SIZE[1]-FIELD_SIZE[1])-BOT_SCAN_RADIUS[1])%FIELD_SIZE[1]]
+            if Area.field_complete_empty(start_field[0], start_field[1]) == True:
+                bot_fits = True
 
         return start_field
 
@@ -617,7 +615,21 @@ class Bot:
         Dann muss eine neue Stelle für den Bot gesucht werden
         :return:
         """
-        pass
+        self.fill_cells(self.bot_cells)
+
+    def fill_cells(self, cells_in: list):
+        """
+        Füllt alle Zellen der als Parameter übertragenen Felder mit dem angegebenen Element.
+        :param list_of_fields: Liste aller Felder [x, y], die mit der entsprechenden Element gefüllt werden sollen
+        :param form: Element, das auf den Feldern platziert werden soll
+        """
+        self.cells_in = cells_in
+        for cells in self.cells_in:
+            x_start = cells[0][0]
+            y_start = cells[0][1]
+            for x in range(x_start, x_start+FIELD_SIZE[0]):
+                for y in range(y_start, y_start+FIELD_SIZE[1]):
+                    self.area[y, x] = self.bot_cells([x][0],[y][1])
 
     def find_direction(self) -> complex:
         """
