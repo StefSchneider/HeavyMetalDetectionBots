@@ -94,6 +94,7 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 ## 28.9.2019 # 17:35 # E
 ## 29.9.2019 # 11:44 # A # Refactoring / Bot Rules
 ## 29.9.2019 # 12:07 # E
+## 29.9.2019 # 14:08 # A
 
 
 
@@ -167,10 +168,12 @@ BOT_DIRECTIONS = {"up": [-1, 0], # [y, x]-Reihenfolge wg. numpy.ndarray
 # VARIABLEN
 
 bots: list = [] # Liste mit allen Bots
+bots_remain: list = [] # Liste mit den Bots, die in der aktuellen Runde noch keinen Zug gemacht haben
 bots_on_lemmium: set = {}   # Sobald ein Bot ein Heavy-Lemmium-Feld erreicht hat, wird seine Nummer in die Menge
                             # aufgenommen. Falls die Länge dieser Menge der Anzahl der Bots entspricht, haben alle
                             # Bots Heavy Lemmium erreicht und die Suche ist beendet. Anstelle einer Liste wird eine
                             # Menge erzeugt, da diese die entsprechenden Bots nur einmal und nicht doppelt aufnimmt.
+lap: int = 0 # Spielrunde, in der sich die Bots aktuell bewegen
 
 
 # KLASSEN
@@ -410,6 +413,17 @@ class Area:
                     rock_fields.append([field[0]+start_field[0], field[1]+start_field[1]])
             self.fill_fields(rock_fields, "Rock")
 
+    def drop_bots(self):
+        """
+
+        """
+        for i in range(BOT_NUMBER):
+            bot = Bot()
+            bot.drop()
+            bot.id = i
+            bot.position = [x, y]
+            bots.append(bot.id)
+
     def build(self):
         """
         Nachdem über die Methode __init__ das Spielfeld als Array angelegt wurde, wird die Spielumgebung in mehreren
@@ -422,7 +436,7 @@ class Area:
         self.build_pain_initial() # Füllen aller Zellen mit Plain
         self.build_lemmium() # Platzierung der Felder für Lemmium
         self.build_rocks() # Platzierung der Felder für Rocks
-        # 4. Platzierung der Bots
+        self.drop_bots() # Platzierung der Bots
 
     def line_content(self, line: list)-> str:
         """
@@ -543,8 +557,8 @@ class Bot:
 
     """
     id: int = 0
-    bot_cells: list = []    # Liste der Zellen, die der einzelne Bot belegt. Muss außerhalb der __init__-Methode stehen,
-                            # da sie regelmäßig angepasst werden muss.
+    position: list = []
+
     bot_directions: list = list(BOT_DIRECTIONS.keys()) # ermittelt aus der Konstanten die möglichen Richtungen
     overlap_cells: int = 0 # Anzahl der Zellen, die sich der Bot mit anderen Bots überschneidet
 
@@ -552,11 +566,13 @@ class Bot:
         """
 
         """
+        bot_cells: list = []    # Liste der Zellen, die der einzelne Bot belegt. Muss außerhalb der __init__-Methode
+                                # stehen, da sie regelmäßig angepasst werden muss.
         # initiales Befüllen mit Bot-Zellen
         for x in range(BOT_SCAN_RADIUS[0]):
             for y in range(BOT_SCAN_RADIUS[1]):
-                bot_cells(([x, y], "1"))
-        # Aufnahme der Lemmium-Medium-Felder in die Liste durch Austausch entsprechender Lemmium-Light-Felder
+                bot_cells.append(([x, y], "1"))
+        # Aufnahme der Bot_Core-Felder in die Liste durch Austausch entsprechender Bot-Scan-Felder
         start_bot_core: list = [int((BOT_SCAN_RADIUS[0]-BOT_SIZE[0])/2), int((BOT_SCAN_RADIUS[1]-BOT_SIZE[1])/2)]
         for x in range(start_bot_core[0], start_bot_core[0]+BOT_SIZE[0]):
             for y in range(start_bot_core[1], start_bot_core[1]+BOT_SIZE[1]):
@@ -574,6 +590,27 @@ class Bot:
 
         :return:
         """
+
+    def determine_start_point(self)-> list:
+        """
+        Ermittelt einen geeigneten Startpunkt [x, y] für ein Element, indem solange per Zufallsgenerator ein Startpunkt
+        ermittelt und überprüft werden, ob damit in die Spielumgebung passt, bis der Startpunkt gefunden ist.
+        :param input_list: Liste der Felder, die das Element umfasst
+        :return: [x, y]-Werte des geeigneten Startpunkts
+        """
+        bot_fits: bool = False
+        start_field: list = []
+        while bot_fits == False:
+            start_field = [random.randint(0, AREA_SIZE[0]-BOT_SIZE[0]),
+                           random.randint(0, AREA_SIZE[1]-BOT_SIZE[1])]
+            for field in self.fields_in:
+                if self.field_complete_empty([field[0]+start_field[0], field[1]+start_field[1]]) == True:
+                    item_fits = True
+                else:
+                    item_fits = False
+                    break
+
+        return start_field
 
     def drop(self):
         """
@@ -652,3 +689,5 @@ class Gui:
 area = Area(AREA_SIZE[0]*FIELD_SIZE[0]*CELL_SIZE[0], AREA_SIZE[1]*FIELD_SIZE[1]*CELL_SIZE[1])
 area.build()
 area.fullprint()
+bots_remain = bots[:]
+print(bots_remain)
