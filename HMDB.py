@@ -101,6 +101,8 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 ## 29.9.2019 # 17:36 # E
 ## 29.9.2019 # 19:33 # A
 ## 29.9.2019 # 20:25 # E
+## 2.10.2019 # 8:00 # A # Method filter_items
+## 2.10.2019 # 8:30 # E
 
 
 # IMPORTE
@@ -451,6 +453,22 @@ class Area:
         self.build_lemmium() # Platzierung der Felder für Lemmium
         self.build_rocks() # Platzierung der Felder für Rocks
         self.drop_bots() # Platzierung der Bots
+
+    def filter_items(self, items_left: list, items_delete: list):
+        """
+        Die Methode erstellt ein Abbild des aktuellen Spielfelds und tauscht die Belegung der einzelnen Zellen gegen
+        True-/False-Werte aus. True wird gesetzt, wenn die Zele entweder mit einem Objekt der Klasse Plain belegt ist
+        oder leer ist. False wird gesetzt, wenn sich ein Objekt der Klasse Items auf der Zelle befindet.
+        Damit können das gesamte Spielfeld oder einzelne Teile wie beispielsweise Felder später mit der Methode
+        nd.array.all() überprüft einfach überprüft werden, ob sie frei oder belegt sind. Diese Methode liefert den Wert
+        True zurück, wenn alle Zellen eines abgefragten Bereichs den Wert True haben.
+        :param items_left: Elemnte, die auf dem Spielfeld verbleiben dürfen und trotzdem den Wert True erhalten
+        :param items_delete: Elemente, die eine Zelle blockieren und damit den Wert False erhalten.
+        """
+        self.items_left = items_left
+        self.items_delete = items_delete
+        image_area = self.numpy.ndarray.copy()
+        pass
 
     def line_content(self, line: list)-> str:
         """
