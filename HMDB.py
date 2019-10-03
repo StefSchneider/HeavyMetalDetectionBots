@@ -105,6 +105,8 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 ## 2.10.2019 # 8:30 # E
 ## 3.10.2019 # 14:11 # A # Method filter_items
 ## 3.10.2019 # 14:34 # E
+## 3.10.2019 # 20:06 # A # Method filter_items
+## 3.10.2019 # 20:56 # E
 
 
 
@@ -199,6 +201,10 @@ class Area:
         self.x_size = x_size
         self.y_size = y_size
         self.area = np.ndarray(shape=(self.y_size, self.x_size), dtype=Cell) # Anlage des Arrays für Area
+        self.image_area = self.area.copy()
+        print("def __init__", type(self.area))
+        print("def __init__", type(self.image_area))
+
 
     def __str__(self):
         """
@@ -228,6 +234,7 @@ class Area:
             fields = self.create_rock()
         elif self.item_form == "Lemmium":
             fields = self.create_lemmium()
+        print("def create", type(self.area))
 
         return fields
 
@@ -323,6 +330,7 @@ class Area:
             for x in range(x_start, x_start+FIELD_SIZE[0]):
                 for y in range(y_start, y_start+FIELD_SIZE[1]):
                     self.area[y, x] = Item(self.item_form)
+        print("def fill_fields", type(self.area))
 
     def fill_cells(self, cells_in: int, item_form: str):
         """
@@ -391,6 +399,7 @@ class Area:
             for y in range(AREA_SIZE[1]):
                 all_cells.append([x + start_field[0], y + start_field[1]])
         self.fill_fields(all_cells, "Plain")
+        print("def build_plain_initial", type(self.area))
 
     def build_lemmium(self):
         """
@@ -417,6 +426,7 @@ class Area:
         for i, field in enumerate(lemmium_heavy_fields):
             lemmium_heavy_fields[i] = [field[0] + start_field[0], field[1] + start_field[1]]
         self.fill_fields(lemmium_heavy_fields, "Lemmium Heavy")
+    print("def build_lemmium")
 
     def build_rocks(self):
         """
@@ -432,6 +442,7 @@ class Area:
             for field in rock_fields_split:
                     rock_fields.append([field[0]+start_field[0], field[1]+start_field[1]])
             self.fill_fields(rock_fields, "Rock")
+        print("def build_rocks", type(self.area))
 
     def drop_bots(self):
         """
@@ -458,6 +469,7 @@ class Area:
         self.build_lemmium() # Platzierung der Felder für Lemmium
         self.build_rocks() # Platzierung der Felder für Rocks
         self.drop_bots() # Platzierung der Bots
+        print("def build", type(self.area))
 
     def filter_items(self, items_left: list, items_delete: list):
         """
@@ -472,19 +484,20 @@ class Area:
         """
         self.items_left = items_left
         self.items_delete = items_delete
-        image_area = self.area.copy()
+        print("filter item / self.area", type(self.area))
         for x in range(self.area.shape[1]):
             for y in range(self.area.shape[0]):
                 if self.area[y, x] in self.items_left:
-                    image_area[y, y] = True
+                    self.image_area[y, y] = True
                 elif self.area[y, x] in self.items_delete:
-                    image_area[y, x] = False
+                    self.image_area[y, x] = False
                 else:
-                    image_area[y, x] = False
+                    self.image_area[y, x] = False
 
-        print(image_area)
+        print(self.image_area)
+        print("def filter_items", type(self.area))
 
-        return image_area
+#        return self.image_area
 
     def line_content(self, line: list)-> str:
         """
@@ -534,6 +547,7 @@ class Area:
                 print(self.line_divider())
             print(self.line_content(self.area[i]))
         print(self.line_divider())
+        print("def fullprint", type(self.area))
 
 
 class Field:
@@ -777,10 +791,17 @@ class Gui:
 # HAUPTPROGRAMM
 
 area = Area(AREA_SIZE[0]*FIELD_SIZE[0]*CELL_SIZE[0], AREA_SIZE[1]*FIELD_SIZE[1]*CELL_SIZE[1])
+print("main area",type(area))
 area.build()
+print("main build",type(area))
 area.fullprint()
+print("main fullprint",type(area))
 #image = Area(AREA_SIZE[0]*FIELD_SIZE[0]*CELL_SIZE[0], AREA_SIZE[1]*FIELD_SIZE[1]*CELL_SIZE[1])
+#image = area
+#print("main image", type(image))
+
 image = area.filter_items(["P", " "], ["R", "LL", "LM", "LH"])
-#image.fullprint()
+print("main image filter",type(image))
+image.fullprint()
 bots_remain = bots[:]
 print(bots_remain)
