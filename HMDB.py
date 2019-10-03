@@ -103,6 +103,9 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 ## 29.9.2019 # 20:25 # E
 ## 2.10.2019 # 8:00 # A # Method filter_items
 ## 2.10.2019 # 8:30 # E
+## 3.10.2019 # 14:11 # A # Method filter_items
+## 3.10.2019 # 14:34 # E
+
 
 
 # IMPORTE
@@ -434,11 +437,13 @@ class Area:
         """
 
         """
-        for i in range(BOT_NUMBER):
-            bot = Bot()
-            bot.drop()
-            bot.id = i+1
-            bots.append(bot.id)
+ #       for i in range(BOT_NUMBER):
+ #           bot = Bot()
+ #           bot.drop()
+ #           bot.id = i+1
+ #           bots.append(bot.id)
+
+    pass
 
     def build(self):
         """
@@ -467,8 +472,19 @@ class Area:
         """
         self.items_left = items_left
         self.items_delete = items_delete
-        image_area = self.numpy.ndarray.copy()
-        pass
+        image_area = self.area.copy()
+        for x in range(self.area.shape[1]):
+            for y in range(self.area.shape[0]):
+                if self.area[y, x] in self.items_left:
+                    image_area[y, y] = True
+                elif self.area[y, x] in self.items_delete:
+                    image_area[y, x] = False
+                else:
+                    image_area[y, x] = False
+
+        print(image_area)
+
+        return image_area
 
     def line_content(self, line: list)-> str:
         """
@@ -617,76 +633,16 @@ class Bot:
 
         :return:
         """
+        pass
 
     def __repr__(self):
         """
 
         :return:
         """
+        pass
 
-    def determine_start_cell(self, cells_in)-> list:
-        """
-        Ermittelt einen geeigneten Startpunkt [x, y] für ein Element, indem solange per Zufallsgenerator ein Startpunkt
-        ermittelt und überprüft werden, ob damit in die Spielumgebung passt, bis der Startpunkt gefunden ist.
-        :param input_list: Liste der Felder, die das Element umfasst
-        :return [x, y]-Werte des geeigneten Startpunkts
-        """
-        self.cells_in = cells_in
 
-        bot_fits: bool = False
-        start_cell: list = []
-        while bot_fits == False:
-            start_cell = [random.randint(0, (AREA_SIZE[0]*FIELD_SIZE[0])-BOT_SCAN_RADIUS[0])%FIELD_SIZE[0],
-                           random.randint(0, (AREA_SIZE[1]-FIELD_SIZE[1])-BOT_SCAN_RADIUS[1])%FIELD_SIZE[1]]
-            if Area.field_complete_empty(start_field[0], start_field[1]) == True:
-                bot_fits = True
-
-        return start_field
-
-    def move_valid(self, cells_in: list)-> bool:
-        """
-
-        :param cells_in:
-        :return:
-        """
-        self.cells_in = cells_in
-        cells_empty: bool = False
-        min_x: int = min(cells[0][0] for cells in self.cells_in)
-        max_x: int = max(cells[0][0] for cells in self.cells_in)
-        min_y: int = min(cells[0][1] for cells in self.cells_in)
-        max_y: int = max(cells[0][1] for cells in self.cells_in)
-        for x in range(min_x, max_x+1):
-            for y in range(min_y, max_y+1):
-                if str(Area[y, x]) == ITEM_FORMS["Plain"]["short"]:
-                    cells_empty = True
-                else:
-                    cells_empty = False
-                    break
-
-        return cells_empty
-
-    def drop(self):
-        """
-        Sucht eine passende Stelle für den Bot auf dem Spielfeld und platziert ihn dort.
-        Überprüfen: Kann sich der Bot anschließend in eine Richtung bewegen oder stößt er rundherum auf Hindernisse?
-        Dann muss eine neue Stelle für den Bot gesucht werden
-        :return:
-        """
-        self.fill_cells(self.bot_cells)
-
-    def fill_cells(self, cells_in: list):
-        """
-        Füllt alle Zellen der als Parameter übertragenen Felder mit dem angegebenen Element.
-        :param list_of_fields: Liste aller Felder [x, y], die mit der entsprechenden Element gefüllt werden sollen
-        :param form: Element, das auf den Feldern platziert werden soll
-        """
-        self.cells_in = cells_in
-        for cells in self.cells_in:
-            x_start = cells[0][0]
-            y_start = cells[0][1]
-            for x in range(x_start, x_start+FIELD_SIZE[0]):
-                for y in range(y_start, y_start+FIELD_SIZE[1]):
-                    self.area[y, x] = self.bot_cells([x][0],[y][1])
 
     def find_direction(self) -> complex:
         """
@@ -738,6 +694,73 @@ class Bot:
         return bots_sorted
 
 
+"""
+    def determine_start_cell(self, cells_in)-> list:
+
+        Ermittelt einen geeigneten Startpunkt [x, y] für ein Element, indem solange per Zufallsgenerator ein Startpunkt
+        ermittelt und überprüft werden, ob damit in die Spielumgebung passt, bis der Startpunkt gefunden ist.
+        :param input_list: Liste der Felder, die das Element umfasst
+        :return [x, y]-Werte des geeigneten Startpunkts
+
+        self.cells_in = cells_in
+
+        bot_fits: bool = False
+        start_cell: list = []
+        while bot_fits == False:
+            start_cell = [random.randint(0, (AREA_SIZE[0]*FIELD_SIZE[0])-BOT_SCAN_RADIUS[0])%FIELD_SIZE[0],
+                           random.randint(0, (AREA_SIZE[1]-FIELD_SIZE[1])-BOT_SCAN_RADIUS[1])%FIELD_SIZE[1]]
+            if Area.field_complete_empty(start_field[0], start_field[1]) == True:
+                bot_fits = True
+
+        return start_field
+
+    def move_valid(self, cells_in: list)-> bool:
+
+
+        :param cells_in:
+        :return:
+
+        self.cells_in = cells_in
+        cells_empty: bool = False
+        min_x: int = min(cells[0][0] for cells in self.cells_in)
+        max_x: int = max(cells[0][0] for cells in self.cells_in)
+        min_y: int = min(cells[0][1] for cells in self.cells_in)
+        max_y: int = max(cells[0][1] for cells in self.cells_in)
+        for x in range(min_x, max_x+1):
+            for y in range(min_y, max_y+1):
+                if str(Area[y, x]) == ITEM_FORMS["Plain"]["short"]:
+                    cells_empty = True
+                else:
+                    cells_empty = False
+                    break
+
+        return cells_empty
+
+    def drop(self):
+
+        Sucht eine passende Stelle für den Bot auf dem Spielfeld und platziert ihn dort.
+        Überprüfen: Kann sich der Bot anschließend in eine Richtung bewegen oder stößt er rundherum auf Hindernisse?
+        Dann muss eine neue Stelle für den Bot gesucht werden
+        :return:
+
+        self.fill_cells(self.bot_cells)
+
+    def fill_cells(self, cells_in: list):
+
+        Füllt alle Zellen der als Parameter übertragenen Felder mit dem angegebenen Element.
+        :param list_of_fields: Liste aller Felder [x, y], die mit der entsprechenden Element gefüllt werden sollen
+        :param form: Element, das auf den Feldern platziert werden soll
+
+        self.cells_in = cells_in
+        for cells in self.cells_in:
+            x_start = cells[0][0]
+            y_start = cells[0][1]
+            for x in range(x_start, x_start+FIELD_SIZE[0]):
+                for y in range(y_start, y_start+FIELD_SIZE[1]):
+                    self.area[y, x] = self.bot_cells([x][0],[y][1])
+"""
+
+
 class Gui:
     """
 
@@ -756,5 +779,8 @@ class Gui:
 area = Area(AREA_SIZE[0]*FIELD_SIZE[0]*CELL_SIZE[0], AREA_SIZE[1]*FIELD_SIZE[1]*CELL_SIZE[1])
 area.build()
 area.fullprint()
+#image = Area(AREA_SIZE[0]*FIELD_SIZE[0]*CELL_SIZE[0], AREA_SIZE[1]*FIELD_SIZE[1]*CELL_SIZE[1])
+image = area.filter_items(["P", " "], ["R", "LL", "LM", "LH"])
+#image.fullprint()
 bots_remain = bots[:]
 print(bots_remain)
