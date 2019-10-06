@@ -201,10 +201,7 @@ class Area:
         self.x_size = x_size
         self.y_size = y_size
         self.area = np.ndarray(shape=(self.y_size, self.x_size), dtype=Cell) # Anlage des Arrays für Area
-        self.image_area = self.area.copy()
         print("def __init__", type(self.area))
-        print("def __init__", type(self.image_area))
-
 
     def __str__(self):
         """
@@ -485,6 +482,8 @@ class Area:
         self.items_left = items_left
         self.items_delete = items_delete
         print("filter item / self.area", type(self.area))
+        self.image_area = self.area.copy()
+        print("filter item / self.image area", type(self.image_area))
         for x in range(self.area.shape[1]):
             for y in range(self.area.shape[0]):
                 if self.area[y, x] in self.items_left:
