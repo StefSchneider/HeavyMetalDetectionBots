@@ -496,7 +496,7 @@ class Area:
         print(self.image_area)
         print("def filter_items", type(self.area))
 
-#        return self.image_area
+        return self.image_area
 
     def line_content(self, line: list)-> str:
         """
