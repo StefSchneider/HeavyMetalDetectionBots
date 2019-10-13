@@ -230,7 +230,7 @@ class Area:
             y_start = fields[1]*FIELD_SIZE[1]
             for x in range(x_start, x_start+FIELD_SIZE[0]):
                 for y in range(y_start, y_start+FIELD_SIZE[1]):
-                    self.area[y, x] = Item(self.item_form)
+                    self.area[y, x].item = Item(self.item_form)
 
     def fill_cells(self, cells_in: int, item_form: str):
         """
@@ -289,7 +289,7 @@ class Area:
 
         return start_field
 
-    def build_pain_initial(self):
+    def build_plain_initial(self):
         """
         Befüllt alle Zellen des Spielfeldes initial mit einem Objekt der Klasse Plain
         """
@@ -298,6 +298,7 @@ class Area:
         for x in range(AREA_SIZE[0]):  # Füllt alle Zellen initial mit Objekt der Klasse Item(Plain)
             for y in range(AREA_SIZE[1]):
                 all_cells.append([x + start_field[0], y + start_field[1]])
+                self.area[x+start_field[0], y+start_field[1]] = Cell(x+start_field[0], y+start_field[1])
         self.fill_fields(all_cells, "Plain")
 
     def build_lemmium(self):
@@ -362,7 +363,7 @@ class Area:
         3. Platzierung der Felder für Rocks
         4. Platzierung der Bots
         """
-        self.build_pain_initial() # Füllen aller Zellen mit Plain
+        self.build_plain_initial() # Füllen aller Zellen mit Plain
         self.build_lemmium() # Platzierung der Felder für Lemmium
         self.build_rocks() # Platzierung der Felder für Rocks
         self.drop_bots() # Platzierung der Bots
