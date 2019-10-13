@@ -15,100 +15,6 @@ kurz HMDB. Die HMDB agieren autark als Schwarm. Dabei folgende sie einfachen Reg
 
 """
 
-# Timestamps (DO NOT FORGET)
-## project: Heavy Metal Detection Bots
-## 10.8.2019 # 16:00 # A
-## 10.8.2019 # 17:00 # E
-## 12.8.2019 # 8:10 # A # create story
-## 12.8.2019 # 8:20 # E
-## 12.8.2019 # 19:10 # A
-## 12.8.2019 # 21:00 # E
-## 17.8.2019 # 17:15 # A
-## 17.8.2019 # 17:55 # E
-## 17.8.2019 # 22:20 # A # Classes Field and Area
-## 17.8.2019 # 22:54 # E
-## 18.8.2019 # 7:55 # A
-## 18.8.2019 # 8:31 # E
-## 18.8.2019 # 10:16 # A
-## 18.8.2019 # 10:53 # E
-## 18.8.2019 # 13:36 # A
-## 18.8.2019 # 13:47 # E
-## 18.8.2019 # 21:34 # A
-## 18.8.2019 # 22:34 # E
-## 19.8.2019 # 9:02 # A
-## 19.8.2019 # 9:44 # E
-## 19.8.2019 # 18:01 # A
-## 19.8.2019 # 18:40 # E
-## 20.8.2019 # 21:37 # A
-## 20.8.2019 # 22:27 # E
-## 21.8.2019 # 7:38 # A
-## 21.8.2019 # 8:02 # E
-## 21.8.2019 # 15:41 # A
-## 21.8.2019 # 16:36 # E
-## 21.8.2019 # 18:28 # A # Documentation
-## 21.8.2019 # 19:12 # E
-## 21.8.2019 # 21:32 # A
-## 21.8.2019 # 21:51 # E
-## 22.8.2019 # 9:15 # A
-## 22.8.2019 # 9:35 # E
-## 22.8.2019 # 15:21 # A
-## 22.8.2019 # 16:13 # E
-## 22.8.2019 # 18:16 # A
-## 22.8.2019 # 19:01 # E
-## 30.8.2019 # 8:47 # A
-## 30.8.2019 # 10:58 # E
-## 4.9.2019 # 7:37 # A
-## 4.9.2019 # 8:25 # E
-## 6.9.2019 # 7:27 # A
-## 6.9.2019 # 8:18 # E
-## 9.9.2019 # 7:49 # A # Refactoring
-## 9.9.2019 # 8:19 # E
-## 10.9.2019 # 8:04 # A # Refactoring
-## 10.9.2019 # 8:25 # E
-## 10.9.2019 # 15:22 # A
-## 10.9.2019 # 16:00 # E
-## 17.9.2019 # 7:40 # A
-## 17.9.2019 # 8:41 # E
-## 17.9.2019 # 14:27 # A
-## 17.9.2019 # 14:51 # E
-## 17.9.2019 # 17:00 # A
-## 17.9.2019 # 17:25 # E
-## 17.9.2019 # 18:55 # A # set rocks
-## 17.9.2019 # 20:34 # E
-## 18.9.2019 # 8:09 # A
-## 18.9.2019 # 9:19 # E
-## 20.9.2019 # 20:00 # A
-## 20.9.2019 # 20:47 # E
-## 21.9.2019 # 14:22 # A # Refactoring / Documentation
-## 21.9.2019 # 15:14 # E
-## 21.9.2019 # 16:58 # A # Refactoring / Documentation
-## 22.9.2019 # 17:46 # E
-## 22.9.2019 # 19:52 # A # Refactoring data structure ITEM_FORMS
-## 22.9.2019 # 21:41 # E
-## 24.9.2019 # 7:50 # A # Bot __init___
-## 24.9.2019 # 8:23 # E
-## 25.9.2019 # 19:45 # A
-## 25.9.2019 # 21:18 # E
-## 26.9.2019 # 20:13 # A
-## 26.9.2019 # 20:32 # E
-## 28.9.2019 # 16:57 # A # create Git repository
-## 28.9.2019 # 17:35 # E
-## 29.9.2019 # 11:44 # A # Refactoring / Bot Rules
-## 29.9.2019 # 12:07 # E
-## 29.9.2019 # 14:08 # A
-## 29.9.2019 # 14:48 # E
-## 29.9.2019 # 16:54 # A
-## 29.9.2019 # 17:36 # E
-## 29.9.2019 # 19:33 # A
-## 29.9.2019 # 20:25 # E
-## 2.10.2019 # 8:00 # A # Method filter_items
-## 2.10.2019 # 8:30 # E
-## 3.10.2019 # 14:11 # A # Method filter_items
-## 3.10.2019 # 14:34 # E
-## 3.10.2019 # 20:06 # A # Method filter_items
-## 3.10.2019 # 20:56 # E
-
-
 
 # IMPORTE
 
@@ -126,7 +32,7 @@ INTRO_TEXT: str = ""
 AREA_SIZE: list = [30, 30] # bestimmt, aus wie vielen Feldern die Spielumgebung besteht, x-, y-Wert
 FIELD_SIZE: list = [10, 10] # bestimmt, aus wie vielen Zellen ein Feld besteht
 CELL_SIZE: list = [1, 1] # bestimmt, aus wie vielen Parts eine Zelle besteht, dabei ist eine Zelle die kleinste Einheit
-ROCK_NUMBER: int = 6 # Anzahl der Felsformationen, die in der Spielumgebung platziert werden
+NUMBER_ROCKS_INSERTED: int = 6 # Anzahl der Felsformationen, die in der Spielumgebung platziert werden
 ITEM_FORMS: dict = {"Plain": {"string": "plain", # Kurzversion des Namens
                               "short": " ", # Eintrag, der auf dem Spielfeld angezeigt wird
                               "accessible": True, # Bot darf auf dem Item platziert werden (ja = True, nein = False)
@@ -429,7 +335,7 @@ class Area:
         """
         Platziert die vorgegebene Anzahl an Objekten der Klasse Rock auf ausreichend großen Freiflächen.
         """
-        for rock_numbers in range(ROCK_NUMBER):
+        for rock_numbers in range(NUMBER_ROCKS_INSERTED):
             rock_fields_split: list = []
             rock_fields_all_data = self.create("Rock")
             for fields in rock_fields_all_data: # zieht nur die x-/y-Elemente aus der Liste
