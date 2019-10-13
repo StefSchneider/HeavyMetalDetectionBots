@@ -475,7 +475,7 @@ class Cell(object):
     """
     x_position: int = 0
     y_position: int = 0
-    item: str = ""
+#    item: str = ""
     neighbour_cells: dict = {"up": [0, 0],
                              "down": [0, 0],
                              "left": [0, 0],
@@ -489,6 +489,7 @@ class Cell(object):
         """
         self.x_position = x_position
         self.y_position = y_position
+        self.item = Item("Plain")
 
     def detect_neighbour_cells(self):
         """
