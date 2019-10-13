@@ -230,7 +230,7 @@ class Area:
             y_start = fields[1]*FIELD_SIZE[1]
             for x in range(x_start, x_start+FIELD_SIZE[0]):
                 for y in range(y_start, y_start+FIELD_SIZE[1]):
-                    self.area[y, x].item = Item(self.item_form)
+                    self.area[y, x] = Item(self.item_form)
 
     def fill_cells(self, cells_in: int, item_form: str):
         """
@@ -474,7 +474,7 @@ class Cell(object):
     """
     x_position: int = 0
     y_position: int = 0
-    item: object = None
+    item: str = ""
     neighbour_cells: dict = {"up": [0, 0],
                              "down": [0, 0],
                              "left": [0, 0],
