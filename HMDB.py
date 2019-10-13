@@ -107,7 +107,6 @@ class Area:
         self.x_size = x_size
         self.y_size = y_size
         self.area = np.ndarray(shape=(self.y_size, self.x_size), dtype=Cell) # Anlage des Arrays für Area
-        print("def __init__", type(self.area))
 
     def __str__(self):
         """
@@ -137,7 +136,6 @@ class Area:
             fields = self.create_rock()
         elif self.item_form == "Lemmium":
             fields = self.create_lemmium()
-        print("def create", type(self.area))
 
         return fields
 
@@ -232,8 +230,7 @@ class Area:
             y_start = fields[1]*FIELD_SIZE[1]
             for x in range(x_start, x_start+FIELD_SIZE[0]):
                 for y in range(y_start, y_start+FIELD_SIZE[1]):
-                    self.area[y, x] = Item(self.item_form)
-        print("def fill_fields", type(self.area))
+                    self.area[y, x].item = Item(self.item_form)
 
     def fill_cells(self, cells_in: int, item_form: str):
         """
@@ -302,7 +299,6 @@ class Area:
             for y in range(AREA_SIZE[1]):
                 all_cells.append([x + start_field[0], y + start_field[1]])
         self.fill_fields(all_cells, "Plain")
-        print("def build_plain_initial", type(self.area))
 
     def build_lemmium(self):
         """
@@ -329,7 +325,6 @@ class Area:
         for i, field in enumerate(lemmium_heavy_fields):
             lemmium_heavy_fields[i] = [field[0] + start_field[0], field[1] + start_field[1]]
         self.fill_fields(lemmium_heavy_fields, "Lemmium Heavy")
-    print("def build_lemmium")
 
     def build_rocks(self):
         """
@@ -345,7 +340,6 @@ class Area:
             for field in rock_fields_split:
                     rock_fields.append([field[0]+start_field[0], field[1]+start_field[1]])
             self.fill_fields(rock_fields, "Rock")
-        print("def build_rocks", type(self.area))
 
     def drop_bots(self):
         """
@@ -372,7 +366,6 @@ class Area:
         self.build_lemmium() # Platzierung der Felder für Lemmium
         self.build_rocks() # Platzierung der Felder für Rocks
         self.drop_bots() # Platzierung der Bots
-        print("def build", type(self.area))
 
     def filter_items(self, items_left: list, items_delete: list):
         """
@@ -387,9 +380,7 @@ class Area:
         """
         self.items_left = items_left
         self.items_delete = items_delete
-        print("filter item / self.area", type(self.area))
         self.image_area = self.area.copy()
-        print("filter item / self.image area", type(self.image_area))
         for x in range(self.area.shape[1]):
             for y in range(self.area.shape[0]):
                 if self.area[y, x] in self.items_left:
@@ -398,9 +389,6 @@ class Area:
                     self.image_area[y, x] = False
                 else:
                     self.image_area[y, x] = False
-
-        print(self.image_area)
-        print("def filter_items", type(self.area))
 
         return self.image_area
 
@@ -431,13 +419,13 @@ class Area:
         :return: komplette erzeugte Trennlinie
         """
         divider: str = "--"
-        cross: str = "+"
+        cross_symbol: str = "+"
         out_divider: str = ""
         for i in range(self.area.shape[1]): # Länge der Linie
             if i%FIELD_SIZE[0] == 0: # setzt ein Kreuz in Abhängigkeit der Feldbreite
-                out_divider += cross + " "
+                out_divider += cross_symbol + " "
             out_divider += divider + " "
-        out_divider += cross
+        out_divider += cross_symbol
 
         return out_divider
 
@@ -452,7 +440,6 @@ class Area:
                 print(self.line_divider())
             print(self.line_content(self.area[i]))
         print(self.line_divider())
-        print("def fullprint", type(self.area))
 
 
 class Field:
@@ -481,17 +468,47 @@ class Field:
         pass
 
 
-class Cell:
+class Cell(object):
     """
 
     """
+    x_position: int = 0
+    y_position: int = 0
+    item: object = None
+    neighbour_cells: dict = {"up": [0, 0],
+                             "down": [0, 0],
+                             "left": [0, 0],
+                             "right": [0, 0]
+                             }
+    number_bots_overlap: int = 0
 
-    def __init__(self):
+    def __init__(self, x_position: int, y_position: int):
         """
 
         """
-        pass
+        self.x_position = x_position
+        self.y_position = y_position
 
+    def detect_neighbour_cells(self):
+        """
+
+        """
+        if self.y_position-1 >= 0:
+            self.neighbour_cells["up"] = [self.x_position, self.y_position-1]
+        else:
+            self.neighbour_cells["up"] = [None, None]
+        if self.y_position+1 <= AREA_SIZE[1]*FIELD_SIZE[1]*CELL_SIZE[1]:
+            self.neighbour_cells["down"] = [self.x_position, self.y_position+1]
+        else:
+            self.neighbour_cells["down"] = [None, None]
+        if self.x_position-1 >= 0:
+            self.neighbour_cells["left"] = [self.x_position-1, self.y_position]
+        else:
+            self.neighbour_cells["left"] = [None, None]
+        if self.x_position+1 <= AREA_SIZE[0]*FIELD_SIZE[0]*CELL_SIZE[0]:
+            self.neighbour_cells["right"] = [self.x_position+1, self.y_position]
+        else:
+            self.neighbour_cells["right"] = [None, None]
 
 
 class Item:
@@ -561,8 +578,6 @@ class Bot:
         :return:
         """
         pass
-
-
 
     def find_direction(self) -> complex:
         """
@@ -697,17 +712,11 @@ class Gui:
 # HAUPTPROGRAMM
 
 area = Area(AREA_SIZE[0]*FIELD_SIZE[0]*CELL_SIZE[0], AREA_SIZE[1]*FIELD_SIZE[1]*CELL_SIZE[1])
-print("main area",type(area))
 area.build()
-print("main build",type(area))
 area.fullprint()
-print("main fullprint",type(area))
 #image = Area(AREA_SIZE[0]*FIELD_SIZE[0]*CELL_SIZE[0], AREA_SIZE[1]*FIELD_SIZE[1]*CELL_SIZE[1])
 #image = area
 #print("main image", type(image))
 
-image = area.filter_items(["P", " "], ["R", "LL", "LM", "LH"])
-print("main image filter",type(image))
-image.fullprint()
 bots_remain = bots[:]
 print(bots_remain)
