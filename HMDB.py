@@ -289,6 +289,14 @@ class Area:
 
         return start_field
 
+    def fill_initial(self):
+        """
+
+        """
+        for x in range(self.area.shape[1]):
+            for y in range(self.area.shape[0]):
+                self.area[y,x] = Cell(x,y)
+
     def build_plain_initial(self):
         """
         Befüllt alle Zellen des Spielfeldes initial mit einem Objekt der Klasse Plain
@@ -363,7 +371,8 @@ class Area:
         3. Platzierung der Felder für Rocks
         4. Platzierung der Bots
         """
-        self.build_plain_initial() # Füllen aller Zellen mit Plain
+        self.fill_initial()
+ #       self.build_plain_initial() # Füllen aller Zellen mit Plain
         self.build_lemmium() # Platzierung der Felder für Lemmium
         self.build_rocks() # Platzierung der Felder für Rocks
         self.drop_bots() # Platzierung der Bots
@@ -475,7 +484,7 @@ class Cell(object):
     """
     x_position: int = 0
     y_position: int = 0
-#    item: str = ""
+    item: str = ""
     neighbour_cells: dict = {"up": [0, 0],
                              "down": [0, 0],
                              "left": [0, 0],
